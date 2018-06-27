@@ -34,6 +34,7 @@ module RSpec
         # should be defined on a subclass. Takes care of consistently
         # initializing the `actual` attribute.
         def matches?(actual)
+          @actual = actual
           @expected_diff, @actual_diff = RSpec::Support::DiffFormatter.format(expected, actual)
           match(expected, actual)
         end
@@ -94,7 +95,11 @@ module RSpec
 
         # @private
         def actual_formatted
-          @actual_diff
+          if defined?(@actual_diff)
+            @actual_diff
+          else
+            RSpec::Support::ObjectFormatter.format(actual)
+          end
         end
 
         # @private
