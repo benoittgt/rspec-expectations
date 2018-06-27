@@ -20,7 +20,7 @@ module RSpec
         UNDEFINED = Object.new.freeze
 
         # @private
-        attr_reader :actual, :expected, :rescued_exception
+        attr_reader :actual, :actual_diff, :expected, :expected_diff, :rescued_exception
 
         # @private
         attr_writer :matcher_name
@@ -34,7 +34,7 @@ module RSpec
         # should be defined on a subclass. Takes care of consistently
         # initializing the `actual` attribute.
         def matches?(actual)
-          @actual = actual
+          @expected_diff, @actual_diff = RSpec::Support::DiffFormatter.format(expected, actual)
           match(expected, actual)
         end
 
@@ -85,12 +85,16 @@ module RSpec
 
         # @private
         def expected_formatted
-          RSpec::Support::ObjectFormatter.format(@expected)
+          if defined?(@expected_diff)
+            @expected_diff
+          else
+            RSpec::Support::ObjectFormatter.format(@expected)
+          end
         end
 
         # @private
         def actual_formatted
-          RSpec::Support::ObjectFormatter.format(@actual)
+          @actual_diff
         end
 
         # @private
